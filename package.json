@@ -2,7 +2,11 @@
     "name": "arduino-cloud-tuya-energy-nodered",
     "description": "Connect a Tuya Energy Meter to the Arduino Cloud using Node-RED",
     "version": "0.0.1",
-    "dependencies": {},
+    "dependencies": {
+        "@arduino/node-red-contrib-arduino-iot-cloud": "1.0.7",
+        "node-red-contrib-cron-plus": "1.5.7",
+        "node-red-contrib-tuya-smart-device": "5.2.0"
+    },
     "node-red": {
         "settings": {
             "flowFile": "flow.json",

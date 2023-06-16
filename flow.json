@@ -1,1 +1,927 @@
-[]
+[
+    {
+        "id": "f87942f8cfc56ace",
+        "type": "tab",
+        "label": "Tuya_SmartLife",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "dc42d42587cc29ad",
+        "type": "arduino-connection",
+        "applicationname": "Arduino Node Red"
+    },
+    {
+        "id": "76b249c5dcbef6b5",
+        "type": "inject",
+        "z": "f87942f8cfc56ace",
+        "name": "REFRESH",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"operation\":\"REFRESH\",\"schema\":true}",
+        "payloadType": "json",
+        "x": 300,
+        "y": 240,
+        "wires": [
+            [
+                "2cf8e1fa4874dd1f"
+            ]
+        ]
+    },
+    {
+        "id": "85bf3812b45fbd36",
+        "type": "debug",
+        "z": "f87942f8cfc56ace",
+        "name": "DBT: Tuya: Raw message",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 610,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "63ee58f94fe88603",
+        "type": "debug",
+        "z": "f87942f8cfc56ace",
+        "name": "DBG: Tuya: State",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 830,
+        "y": 580,
+        "wires": []
+    },
+    {
+        "id": "60ee32d3ad69e3a0",
+        "type": "function",
+        "z": "f87942f8cfc56ace",
+        "name": "Decode \"phase_a\"",
+        "func": "/*\n    Phase_a parsing rules:\n\n        A-phase voltage, current and power\n        Big-endian mode, HEX format, 10 bytes in total\n        unit accuracy: voltage, 2 bytes, unit 0.1V. Current, 3 bytes, 0.001a. Phase A active power, 3 bytes, unit 0.001kW\n        Packet format\n\n    For example, 08 80 00 03 E8 00 27 10 indicates the A phase 217.6V, the A phase current 1.000A, and the A phase power\n    10.000 KW\n*/\n\n\n// Function to decode Base64 string and extract fields\nfunction decodeBase64(base64String) {\n    // Decode Base64\n    const binaryString = Buffer.from(base64String, 'base64').toString('binary');\n\n    // Convert binary string to hexadecimal\n    let hexString = '';\n    for (let i = 0; i < binaryString.length; i++) {\n        const hex = binaryString.charCodeAt(i).toString(16).padStart(2, '0');\n        hexString += hex;\n    }\n\n    // Extract fields\n    const voltageHex = hexString.substr(0, 4);\n    const currentHex = hexString.substr(4, 6);\n    const powerHex = hexString.substr(10, 6);\n\n    // Convert fields to decimal\n    const voltage = parseInt(voltageHex, 16) * 0.1;\n    const current = parseInt(currentHex, 16) * 0.001;\n    const power = parseInt(powerHex, 16) * 0.001;\n\n    // Return the decoded fields\n    return {\n        voltage: voltage,\n        current: current,\n        power: power\n    };\n}\n\n// Node-RED function node\nconst encodedString = msg.payload.data.dps['6'];\n\n// Decode the Base64 string and extract fields\nconst decodedFields = decodeBase64(encodedString);\n\n// Store the decoded fields in msg.decodedFields\nmsg.payload = decodedFields;\n\n// Send the modified message to the next node\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 730,
+        "y": 240,
+        "wires": [
+            [
+                "39a7f8986c143649"
+            ]
+        ]
+    },
+    {
+        "id": "ac1c926105abca33",
+        "type": "debug",
+        "z": "f87942f8cfc56ace",
+        "name": "DBG: Tuya: Power",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1350,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "9f90c7c49c805bfc",
+        "type": "switch",
+        "z": "f87942f8cfc56ace",
+        "name": "",
+        "property": "payload.data.dps",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "hask",
+                "v": "6",
+                "vt": "str"
+            },
+            {
+                "t": "hask",
+                "v": "1",
+                "vt": "str"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 3,
+        "x": 550,
+        "y": 300,
+        "wires": [
+            [
+                "60ee32d3ad69e3a0"
+            ],
+            [
+                "3032ad1234e6b61f",
+                "e16cff4c3c6b28d7"
+            ],
+            [
+                "cf5b4ff14d9f2dcb"
+            ]
+        ]
+    },
+    {
+        "id": "f46f3492be68404b",
+        "type": "switch",
+        "z": "f87942f8cfc56ace",
+        "name": "",
+        "property": "topic",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "power",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "voltage",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "current",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 3,
+        "x": 1070,
+        "y": 240,
+        "wires": [
+            [
+                "ac1c926105abca33",
+                "783fc329750e0dc8"
+            ],
+            [
+                "61b9e72c1ff43dc3",
+                "905e8a77c8fd2be0"
+            ],
+            [
+                "d9193253fe0907ec",
+                "bf1fbcf1760b4ed5"
+            ]
+        ]
+    },
+    {
+        "id": "61b9e72c1ff43dc3",
+        "type": "debug",
+        "z": "f87942f8cfc56ace",
+        "name": "DBG: Tuya: Voltage",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1350,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "d9193253fe0907ec",
+        "type": "debug",
+        "z": "f87942f8cfc56ace",
+        "name": "DBG: Tuya: Current",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1350,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "96c41f410e110fb1",
+        "type": "debug",
+        "z": "f87942f8cfc56ace",
+        "name": "DBG: Tuya: Total Fwd Energy",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1380,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "0b71fe9de49f4e79",
+        "type": "debug",
+        "z": "f87942f8cfc56ace",
+        "name": "debug 6",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1080,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "39a7f8986c143649",
+        "type": "split",
+        "z": "f87942f8cfc56ace",
+        "name": "",
+        "splt": "\\n",
+        "spltType": "str",
+        "arraySplt": 1,
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "topic",
+        "x": 910,
+        "y": 240,
+        "wires": [
+            [
+                "f46f3492be68404b",
+                "0b71fe9de49f4e79"
+            ]
+        ]
+    },
+    {
+        "id": "783fc329750e0dc8",
+        "type": "property out",
+        "z": "f87942f8cfc56ace",
+        "connection": "dc42d42587cc29ad",
+        "thing": "3beeb0b4-e64c-49bb-9481-52dade31684c",
+        "property": "ab605aa6-7aac-4ab4-a9b3-73f4c791c64a",
+        "name": "power",
+        "propname": "power",
+        "defaultname": true,
+        "x": 1310,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "905e8a77c8fd2be0",
+        "type": "property out",
+        "z": "f87942f8cfc56ace",
+        "connection": "dc42d42587cc29ad",
+        "thing": "3beeb0b4-e64c-49bb-9481-52dade31684c",
+        "property": "75910254-c858-45dd-9226-a0cb9a7de2ff",
+        "name": "voltage",
+        "propname": "voltage",
+        "defaultname": true,
+        "x": 1320,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "bf1fbcf1760b4ed5",
+        "type": "property out",
+        "z": "f87942f8cfc56ace",
+        "connection": "dc42d42587cc29ad",
+        "thing": "3beeb0b4-e64c-49bb-9481-52dade31684c",
+        "property": "987cfc6b-680d-44a4-9e86-87fda4a00b61",
+        "name": "current",
+        "propname": "current",
+        "defaultname": true,
+        "x": 1320,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "104716366a8ffdde",
+        "type": "property out",
+        "z": "f87942f8cfc56ace",
+        "connection": "dc42d42587cc29ad",
+        "thing": "3beeb0b4-e64c-49bb-9481-52dade31684c",
+        "property": "984da6e7-1a59-44a7-83fe-42a20c7eb05f",
+        "name": "total_forward_energy",
+        "propname": "total_forward_energy",
+        "defaultname": true,
+        "x": 1360,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "3032ad1234e6b61f",
+        "type": "function",
+        "z": "f87942f8cfc56ace",
+        "name": "Convert to kWh",
+        "func": "msg.payload = msg.payload.data.dps[1] / 100;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1040,
+        "y": 300,
+        "wires": [
+            [
+                "96c41f410e110fb1",
+                "104716366a8ffdde"
+            ]
+        ]
+    },
+    {
+        "id": "cf5b4ff14d9f2dcb",
+        "type": "debug",
+        "z": "f87942f8cfc56ace",
+        "name": "DBG: Tuya: Other messages",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 780,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "b574a37811aa89e6",
+        "type": "function",
+        "z": "f87942f8cfc56ace",
+        "name": "Rest of the fields",
+        "func": "/*\nEste es el mapeo de los campos dentro de DPS respecto code de la API\n 1:  \"total_forward_energy\"  - Cada 2min aprox\n 6:  \"phase_a\"  - Cada segundo\n 17: \"alarm_set_1\"  - Muy esporádicamente (6 mins?)\n 18: \"alarm_set_2\"  - Muy esporádicamente\n No he detectado mas mensajes \n*/\n/* Se deduce de que on la siguiente peticion obtengo los siguientes campos\n\ncurl --request GET \"https://openapi.tuyaeu.com/v1.0/iot-03/devices/bf8b677a521630dea9jlvm/status\" --header \"sign_method: HMAC-SHA256\" --header \"client_id: dcwyx3kc7kqjpw38334d\" --header \"t: 1686176264875\" --header \"mode: cors\" --header \"Content-Type: application/json\" --header \"sign: C4C29D36E929B1FF1F246BA91FD7D52071468660489863873DB315C0A5979BE3\" --header \"access_token: 79e2f479a2a19d7c7a5d5d84ab7354f0\"\n\n{\n  \"result\": [\n    {\n      \"code\": \"total_forward_energy\",\n      \"value\": 21327\n    },\n    {\n      \"code\": \"phase_a\",\n      \"value\": \"CSQABvsAAUo=\"\n    },\n    {\n      \"code\": \"fault\",\n      \"value\": 0\n    },\n    {\n      \"code\": \"switch_prepayment\",\n      \"value\": false\n    },\n    {\n      \"code\": \"energy_reset\",\n      \"value\": \"\"\n    },\n    {\n      \"code\": \"balance_energy\",\n      \"value\": 0\n    },\n    {\n      \"code\": \"charge_energy\",\n      \"value\": 0\n    },\n    {\n      \"code\": \"leakage_current\",\n      \"value\": 0\n    },\n    {\n      \"code\": \"switch\",\n      \"value\": true\n    },\n    {\n      \"code\": \"alarm_set_1\",\n      \"value\": \"BAAAAA==\"\n    },\n    {\n      \"code\": \"alarm_set_2\",\n      \"value\": \"AQEAMgMBAQ4EAQCqCAAAHgkAAAA=\"\n    }\n  ],\n  \"success\": true,\n  \"t\": 1686176264996,\n  \"tid\": \"20839c79058111eebfbfa24bf1d21c99\"\n}\n\n*/",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 750,
+        "y": 420,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b3a99f3cf0f34672",
+        "type": "property out",
+        "z": "f87942f8cfc56ace",
+        "connection": "dc42d42587cc29ad",
+        "thing": "3beeb0b4-e64c-49bb-9481-52dade31684c",
+        "property": "108df17e-20b7-4128-b4d8-05c930b767a2",
+        "name": "state",
+        "propname": "state",
+        "defaultname": true,
+        "x": 790,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "2892bf50d336426f",
+        "type": "change",
+        "z": "f87942f8cfc56ace",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.state",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 580,
+        "y": 520,
+        "wires": [
+            [
+                "b3a99f3cf0f34672",
+                "63ee58f94fe88603"
+            ]
+        ]
+    },
+    {
+        "id": "d3290d731806201a",
+        "type": "property out",
+        "z": "f87942f8cfc56ace",
+        "connection": "dc42d42587cc29ad",
+        "thing": "3beeb0b4-e64c-49bb-9481-52dade31684c",
+        "property": "4b9cc553-3f47-4726-b46d-66d3ef36ef30",
+        "name": "connected",
+        "propname": "connected",
+        "defaultname": true,
+        "x": 810,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "e8919a7b5ee5f376",
+        "type": "function",
+        "z": "f87942f8cfc56ace",
+        "name": "State to Connected",
+        "func": "if (msg.payload.state == \"CONNECTED\")\n    msg.payload = true;\nelse\n    msg.payload = false;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 590,
+        "y": 480,
+        "wires": [
+            [
+                "d3290d731806201a"
+            ]
+        ]
+    },
+    {
+        "id": "98f5f4496f67ae46",
+        "type": "inject",
+        "z": "f87942f8cfc56ace",
+        "name": "RECONNECT",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"operation\":\"CONTROL\",\"action\":\"RECONNECTS\"}",
+        "payloadType": "json",
+        "x": 290,
+        "y": 420,
+        "wires": [
+            [
+                "2cf8e1fa4874dd1f"
+            ]
+        ]
+    },
+    {
+        "id": "a149f0aaa3f16df0",
+        "type": "http request",
+        "z": "f87942f8cfc56ace",
+        "name": "RT price",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "https://api.preciodelaluz.org/v1/prices/now?zone=PCB",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 600,
+        "y": 760,
+        "wires": [
+            [
+                "ec41215f5bc62d00"
+            ]
+        ]
+    },
+    {
+        "id": "816a7135e8bebab4",
+        "type": "debug",
+        "z": "f87942f8cfc56ace",
+        "name": "DBG: Hourly energy prices",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1000,
+        "y": 680,
+        "wires": []
+    },
+    {
+        "id": "ec41215f5bc62d00",
+        "type": "json",
+        "z": "f87942f8cfc56ace",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 770,
+        "y": 760,
+        "wires": [
+            [
+                "816a7135e8bebab4",
+                "ebbe0b4aa824f7af"
+            ]
+        ]
+    },
+    {
+        "id": "85427bcbc56d266c",
+        "type": "inject",
+        "z": "f87942f8cfc56ace",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "trigger",
+        "payload": "Daily",
+        "payloadType": "str",
+        "x": 290,
+        "y": 820,
+        "wires": [
+            [
+                "e788ca28dda83445"
+            ]
+        ]
+    },
+    {
+        "id": "13ea8b0bfce54390",
+        "type": "http request",
+        "z": "f87942f8cfc56ace",
+        "name": "Day prices",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "https://api.preciodelaluz.org/v1/prices/all?zone=PCB",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 610,
+        "y": 800,
+        "wires": [
+            [
+                "86f705b96b5a41c2"
+            ]
+        ]
+    },
+    {
+        "id": "86f705b96b5a41c2",
+        "type": "json",
+        "z": "f87942f8cfc56ace",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 770,
+        "y": 800,
+        "wires": [
+            [
+                "33a076c9e5f31e57",
+                "5e454363a8ac34d7",
+                "b17268bc7e099340"
+            ]
+        ]
+    },
+    {
+        "id": "521ccc5b0292ebf9",
+        "type": "inject",
+        "z": "f87942f8cfc56ace",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "trigger",
+        "payload": "Hourly",
+        "payloadType": "str",
+        "x": 290,
+        "y": 780,
+        "wires": [
+            [
+                "e788ca28dda83445"
+            ]
+        ]
+    },
+    {
+        "id": "dfe14f4ac088c0ae",
+        "type": "property out",
+        "z": "f87942f8cfc56ace",
+        "connection": "dc42d42587cc29ad",
+        "thing": "3beeb0b4-e64c-49bb-9481-52dade31684c",
+        "property": "a59d74a6-e8e7-44d7-b965-a38a44a1ab95",
+        "name": "hour_energy_price",
+        "propname": "hour_energy_price",
+        "defaultname": true,
+        "x": 1210,
+        "y": 760,
+        "wires": []
+    },
+    {
+        "id": "ebbe0b4aa824f7af",
+        "type": "change",
+        "z": "f87942f8cfc56ace",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "current_price",
+                "pt": "flow",
+                "to": "payload.price",
+                "tot": "msg"
+            },
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.price",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 960,
+        "y": 760,
+        "wires": [
+            [
+                "dfe14f4ac088c0ae",
+                "15c35ce8a9b6c177"
+            ]
+        ]
+    },
+    {
+        "id": "33a076c9e5f31e57",
+        "type": "function",
+        "z": "f87942f8cfc56ace",
+        "name": "To String",
+        "func": "let result = 'Hour: Price cheap under-avg\\n';\nlet data = msg.payload;\nfor (const key in data) {\n    result += `${key}: ${data[key].price} ${data[key][\"is-cheap\"]} ${data[key][\"is-under-avg\"]}\\n`;\n}\n\nmsg.payload = result;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 940,
+        "y": 800,
+        "wires": [
+            [
+                "061ea06df28ca724"
+            ]
+        ]
+    },
+    {
+        "id": "5e454363a8ac34d7",
+        "type": "debug",
+        "z": "f87942f8cfc56ace",
+        "name": "DBG: Daily energy prices",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 990,
+        "y": 880,
+        "wires": []
+    },
+    {
+        "id": "061ea06df28ca724",
+        "type": "property out",
+        "z": "f87942f8cfc56ace",
+        "connection": "dc42d42587cc29ad",
+        "thing": "3beeb0b4-e64c-49bb-9481-52dade31684c",
+        "property": "9ff17a54-60f6-4b74-bf50-6cdb7f6c7126",
+        "name": "daily_energy_price",
+        "propname": "daily_energy_price",
+        "defaultname": true,
+        "x": 1210,
+        "y": 800,
+        "wires": []
+    },
+    {
+        "id": "15c35ce8a9b6c177",
+        "type": "link out",
+        "z": "f87942f8cfc56ace",
+        "name": "RT price (OUT)",
+        "mode": "link",
+        "links": [
+            "1b1e5212141acee9"
+        ],
+        "x": 1135,
+        "y": 720,
+        "wires": []
+    },
+    {
+        "id": "e16cff4c3c6b28d7",
+        "type": "function",
+        "z": "f87942f8cfc56ace",
+        "name": "Get Hourly Fw Energy",
+        "func": "let next_hour_ts = flow.get(\"next_hour_ts\");\nif (next_hour_ts == undefined) {\n    let currentTimestamp = Math.floor(new Date().getTime() / 1000);\n    node.warn(currentTimestamp);\n    next_hour_ts = (currentTimestamp - (currentTimestamp % 3600)) + 3600;\n    node.warn(next_hour_ts);\n    flow.set(\"next_hour_ts\", next_hour_ts);\n}\n\nlet msg_ts = msg.payload.data.t || 0;\nif (msg_ts <= next_hour_ts)\n    return [ null, null ];\n\nnext_hour_ts = (msg_ts - (msg_ts % 3600)) + 3600;\nflow.set(\"next_hour_ts\", next_hour_ts);\n\nvar current_fw_energy   = msg.payload.data.dps[1];\nvar last_hour_fw_energy = flow.get(\"last_hour_fw_energy\");\nif (last_hour_fw_energy == undefined) {\n    flow.set(\"last_hour_fw_energy\", msg.payload.data.dps[1]);\n    return [null, null];\n}\n\nlet current_price = flow.get(\"current_price\");\nlet hourly_fw_energy = (current_fw_energy - last_hour_fw_energy) / 100.0;\nlet hourly_cost      = hourly_fw_energy * current_price / 1000.0;\nlet msg1 = { \"payload\": hourly_fw_energy, \"topic\": \"hourly_fw_energy\" };\nlet msg2 = { \"payload\": hourly_cost,  \"topic\": \"hourly_cost\" };\nreturn [msg1, msg2];\n",
+        "outputs": 2,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1060,
+        "y": 340,
+        "wires": [
+            [
+                "0f8850f2489e709d"
+            ],
+            [
+                "cd703f71688f3cdf"
+            ]
+        ]
+    },
+    {
+        "id": "0f8850f2489e709d",
+        "type": "debug",
+        "z": "f87942f8cfc56ace",
+        "name": "DBG: Tuya: Hourly Fwd Energy",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1390,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "cd703f71688f3cdf",
+        "type": "debug",
+        "z": "f87942f8cfc56ace",
+        "name": "DBG: Tuya: Hourly Cost",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1370,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "b17268bc7e099340",
+        "type": "change",
+        "z": "f87942f8cfc56ace",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "day_price",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 970,
+        "y": 840,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "2cf8e1fa4874dd1f",
+        "type": "tuya-smart-device",
+        "z": "f87942f8cfc56ace",
+        "deviceName": "Energy Meter",
+        "disableAutoStart": false,
+        "deviceId": "bf8b677a521630dea9jlvm",
+        "deviceKey": "s)~nZ<:fA')LmdnX",
+        "storeAsCreds": false,
+        "deviceIp": "",
+        "retryTimeout": 1000,
+        "findTimeout": 10000,
+        "tuyaVersion": "3.1",
+        "eventMode": "event-both",
+        "x": 360,
+        "y": 320,
+        "wires": [
+            [
+                "85bf3812b45fbd36",
+                "9f90c7c49c805bfc"
+            ],
+            [
+                "2892bf50d336426f",
+                "e8919a7b5ee5f376"
+            ]
+        ]
+    },
+    {
+        "id": "e788ca28dda83445",
+        "type": "cronplus",
+        "z": "f87942f8cfc56ace",
+        "name": "",
+        "outputField": "payload",
+        "timeZone": "",
+        "persistDynamic": false,
+        "commandResponseMsgOutput": "fanOut",
+        "outputs": 4,
+        "options": [
+            {
+                "name": "Hourly",
+                "topic": "hourly",
+                "payloadType": "default",
+                "payload": "",
+                "expressionType": "cron",
+                "expression": "5 * * * *",
+                "location": "",
+                "offset": "0",
+                "solarType": "all",
+                "solarEvents": "sunrise,sunset"
+            },
+            {
+                "name": "Daily",
+                "topic": "daily",
+                "payloadType": "default",
+                "payload": "",
+                "expressionType": "cron",
+                "expression": "10 0 * * *",
+                "location": "",
+                "offset": "0",
+                "solarType": "all",
+                "solarEvents": "sunrise,sunset"
+            }
+        ],
+        "x": 440,
+        "y": 800,
+        "wires": [
+            [
+                "a149f0aaa3f16df0"
+            ],
+            [
+                "13ea8b0bfce54390"
+            ],
+            [],
+            []
+        ]
+    }
+]
