@@ -1,0 +1,219 @@
+name: Energy (Tuya)
+widgets:
+    - height: 8
+      height_mobile: 9
+      name: Voltage / Current
+      type: Advanced Chart
+      width: 24
+      width_mobile: 8
+      x: 0
+      x_mobile: 0
+      "y": 24
+      y_mobile: 16
+    - height: 6
+      height_mobile: 4
+      name: Current (A)
+      options:
+        max: 5
+        min: 0
+      type: Gauge
+      variables:
+        - thing_id: Tuya-Energy_Meter
+          variable_id: current
+      width: 6
+      width_mobile: 4
+      x: 0
+      x_mobile: 4
+      "y": 12
+      y_mobile: 12
+    - height: 6
+      height_mobile: 4
+      name: Voltage (V)
+      options:
+        max: 250
+        min: 200
+      type: Gauge
+      variables:
+        - thing_id: Tuya-Energy_Meter
+          variable_id: voltage
+      width: 6
+      width_mobile: 4
+      x: 0
+      x_mobile: 0
+      "y": 6
+      y_mobile: 12
+    - height: 2
+      height_mobile: 2
+      name: Value
+      type: Value
+      variables:
+        - thing_id: Tuya-Energy_Meter
+          variable_id: state
+      width: 4
+      width_mobile: 4
+      x: 0
+      x_mobile: 4
+      "y": 4
+      y_mobile: 0
+    - height: 6
+      height_mobile: 9
+      name: Total Forward Energy (kWh)
+      options:
+        interpolation: line
+      type: Chart
+      variables:
+        - thing_id: Tuya-Energy_Meter
+          variable_id: total_forward_energy
+      width: 18
+      width_mobile: 8
+      x: 6
+      x_mobile: 0
+      "y": 18
+      y_mobile: 25
+    - height: 4
+      height_mobile: 4
+      name: Power (kW)
+      options:
+        max: 10
+        min: 0
+      type: Gauge
+      variables:
+        - thing_id: Tuya-Energy_Meter
+          variable_id: power
+      width: 6
+      width_mobile: 4
+      x: 0
+      x_mobile: 0
+      "y": 0
+      y_mobile: 0
+    - height: 6
+      height_mobile: 9
+      name: Energy price (€/MWh)
+      options:
+        interpolation: line
+      type: Chart
+      variables:
+        - thing_id: Tuya-Energy_Meter
+          variable_id: hour_energy_price
+      width: 13
+      width_mobile: 8
+      x: 11
+      x_mobile: 0
+      "y": 32
+      y_mobile: 56
+    - height: 6
+      height_mobile: 5
+      name: Value
+      type: Value
+      variables:
+        - thing_id: Tuya-Energy_Meter
+          variable_id: daily_energy_price
+      width: 7
+      width_mobile: 8
+      x: 4
+      x_mobile: 0
+      "y": 32
+      y_mobile: 68
+    - height: 2
+      height_mobile: 2
+      name: Connected
+      options:
+        mode: On / Off
+      type: Status
+      variables:
+        - thing_id: Tuya-Energy_Meter
+          variable_id: connected
+      width: 2
+      width_mobile: 4
+      x: 4
+      x_mobile: 4
+      "y": 4
+      y_mobile: 2
+    - height: 6
+      height_mobile: 9
+      name: Current (A)
+      options:
+        interpolation: line
+      type: Chart
+      variables:
+        - thing_id: Tuya-Energy_Meter
+          variable_id: current
+      width: 18
+      width_mobile: 8
+      x: 6
+      x_mobile: 0
+      "y": 12
+      y_mobile: 43
+    - height: 6
+      height_mobile: 9
+      name: Voltage (V)
+      options:
+        interpolation: spline
+      type: Chart
+      variables:
+        - thing_id: Tuya-Energy_Meter
+          variable_id: voltage
+      width: 18
+      width_mobile: 8
+      x: 6
+      x_mobile: 0
+      "y": 6
+      y_mobile: 34
+    - height: 6
+      height_mobile: 8
+      name: Power (kW)
+      options:
+        interpolation: line
+      type: Chart
+      variables:
+        - thing_id: Tuya-Energy_Meter
+          variable_id: power
+      width: 18
+      width_mobile: 8
+      x: 6
+      x_mobile: 0
+      "y": 0
+      y_mobile: 4
+    - height: 6
+      height_mobile: 4
+      name: Total Forward Energy (kWh)
+      type: Value
+      variables:
+        - thing_id: Tuya-Energy_Meter
+          variable_id: total_forward_energy
+      width: 6
+      width_mobile: 4
+      x: 0
+      x_mobile: 0
+      "y": 18
+      y_mobile: 52
+    - height: 2
+      height_mobile: 3
+      name: Energy price (€/MWh)
+      type: Value
+      variables:
+        - thing_id: Tuya-Energy_Meter
+          variable_id: hour_energy_price
+      width: 4
+      width_mobile: 4
+      x: 0
+      x_mobile: 4
+      "y": 32
+      y_mobile: 65
+    - height: 4
+      height_mobile: 3
+      name: Energy Price (€/MWh)
+      options:
+        max: 300
+        min: 0
+      type: Gauge
+      variables:
+        - thing_id: Tuya-Energy_Meter
+          variable_id: hour_energy_price
+      width: 4
+      width_mobile: 4
+      x: 0
+      x_mobile: 0
+      "y": 34
+      y_mobile: 65
+
