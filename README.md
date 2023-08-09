@@ -30,7 +30,8 @@ The platform's IoT Cloud tool allows for easy management and monitoring of conne
 # Pre-requisites
 You need:
 * a Tuya / Smartlife compatible energy meter
-* The Energy Meter added to the Tuya Smart app (iOS / Android) following the instructions ()
+* SmartLife or Tuya app installed in your mobile phone (iOS / Android)
+* The Energy Meter added to the Tuya Smart app
 * an Arduino Cloud account (https://cloud.arduino.cc)
 * an instance of Node-RED (running on a local or Cloud machine). You can find more information about how to install Node-RED [here](https://nodered.org/docs/getting-started/local).
 
@@ -72,18 +73,37 @@ Go to Cloud->API Explorer.
 Click on **Query Device Details in Bulk**. Introduce the **Device ID** and click on **Submit Request**
 In the response, you will find a field **local_key**. Note down the value.
 
-*Note: More detailed information [here](https://github.com/iRayanKhan/homebridge-tuya/wiki/Get-Local-Keys-for-your-devices)
+*Note: You can get more detailed information [here](https://github.com/iRayanKhan/homebridge-tuya/wiki/Get-Local-Keys-for-your-devices)
 
 ## Create the Device in the Arduino Cloud
 ### Create the Device 
-Go to the [Devices](https://create.arduino.cc/iot/devices) section of the Arduino IoT Cloud and click on ADD. 
-Select "Any Device" and follow the instructions on the wizard.
+Go to the [Devices](https://create.arduino.cc/iot/devices) section of the Arduino IoT Cloud and click on **ADD**. 
+Select **Any Device** and follow the instructions on the wizard.
 *Note: Save your `Device ID` and `Secret Key`. We are not going to use them (as we will use the API key), but it can be helpful for other use cases.*
 
 ### Create the Thing 
-In the Devices list, find the device you just created and click on "CREATE THING" and assign a name to it.
+In the Devices list, find the device you just created and click on **CREATE THING** and assign a name to it.
 
 ### Create the Variables 
+Add the variables clicking on the ADD button. At the end of the process, your list of variables should look like this.
+
+| Name                | Type       | Description |
+|---------------------|------------|-------------|
+| state               | CHARSTRING | Text string with the state |
+| connected           | STATUS     | It indicates if the Energy Meter is | power               | FLOAT      | Real-time power |
+| voltage             | FLOAT      | Real-time voltage |
+| current             | FLOAT      | Real-time current |
+| total_forward_energy| FLOAT      | Accumulated energy |
+
+*Note: All the variables have to be READ-WRITE. You can define the periodicity you wish or set them with the policy ON-CHANGE.*
+
+This is a screenshot for reference.
+![Arduino Cloud variables](assets/Tuya-Energy_Meter-variables.png)
+
+### Get an Arduino Cloud API key
+Go to https://cloud.arduino.cc/home/api-keys.
+Click on "CREATE API KEY", enter a name.
+Note down the Client ID and Client Secret or download the PDF. We will use these credentials in the Node-RED node.
 
 ## Create the Node-RED flow
 Access your Node-RED instance (typically `http://<YOUR_IP>:1880`) and import the code:
@@ -94,14 +114,15 @@ Access your Node-RED instance (typically `http://<YOUR_IP>:1880`) and import the
 3. Configure the Arduino Cloud nodes
    a. Configure your connection with the Arduino Cloud API key that you created in the previous section  
    b. Introduce your Thing and property
-![Arduino Cloud variables](assets/Node-RED-Arduino_Cloud-property-node.png)
+![Node properties](assets/Node-RED-Arduino_Cloud-property-node.png)
+*Note: You can adjust your configuration to your needs. For instance, you could leave Device IP empty so that you use the platform directly*
 4. Click on **Deploy** (top right corner of the screen)
 
 ## Create the Arduino Cloud dashboard
-Go to the Dashboards section and click on CREATE. 
+Go to the Dashboards section and click on **CREATE**. 
 You can add the widgets as you wish. Here you have a screenshot of mine as a reference:
 
-![Arduino Cloud variables](assets/Tuya-Arduino_Cloud-dashboard.png)
+![Arduino Cloud dashboard](assets/Tuya-Arduino_Cloud-dashboard.png)
 
 ## Let's test the system
 And that's it.
