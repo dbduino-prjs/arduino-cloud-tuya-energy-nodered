@@ -15,7 +15,7 @@ Arduino Cloud is an excellent solution for that, but integrating external platfo
 This project is part of a series that I've created to showcase how I manage my home systems by integrating them with Arduino Cloud. In addition to this project, I've also worked on integrating [TP Link switches](https://github.com/dbduino-prjs/arduino-cloud-tplink-switch-nodered) and [Honeywell Evohome heating system](https://github.com/dbduino-prjs/arduino-cloud-evohome-nodered), so you can check those out too! 
 
 ## What is Tuya / Smartlife?
-Tuya and Smart Life are platforms and ecosystems for smart home devices and Internet of Things (IoT) products. Tuya provides a cloud-based platform that enables manufacturers to quickly and easily add smart features to their products, such as smart plugs, smart bulbs, smart thermostats, and more. Smart Life is one of the user-facing mobile apps developed by Tuya, allowing users to control and manage their Tuya-compatible smart devices from a single app on their smartphones or tablets.
+[Tuya](https://www.tuya.com/) and [Smart Life](https://ismartlife.me/) are platforms and ecosystems for smart home devices and Internet of Things (IoT) products. Tuya provides a cloud-based platform that enables manufacturers to quickly and easily add smart features to their products, such as smart plugs, smart bulbs, smart thermostats, and more. Smart Life is one of the user-facing mobile apps developed by Tuya, allowing users to control and manage their Tuya-compatible smart devices from a single app on their smartphones or tablets.
 
 Tuya and Smart Life have become popular choices for both manufacturers looking to create smart products and consumers seeking a unified way to manage their various smart devices from different brands. The platforms aim to streamline the development and usage of smart home and IoT devices through cloud connectivity and a user-friendly interface.
 
@@ -47,8 +47,7 @@ You don't need:
 6. Test everything 
 
 ## Install the energy meter in the electric board
-For this project, I used an 
-[Earu Electric Leakage breaker](https://es.aliexpress.com/item/1005005474961812.html?spm=a2g0o.productlist.main.1.64b72e8fBv8qNz&algo_pvid=0190745a-8ab6-4d1b-ae9a-2fc064272739&aem_p4p_detail=202308070751462216909798018100004414180&algo_exp_id=0190745a-8ab6-4d1b-ae9a-2fc064272739-0&pdp_npi=4%40dis%21EUR%2125.22%2113.62%21%21%2127.10%21%21%4021038eda16914199060958571e5420%2112000033229985254%21sea%21ES%21138088978%21&curPageLogUid=4T9VEiT2qT2n&search_p4p_id=202308070751462216909798018100004414180_1). Although it works well, it is true that it needs to be placed in a location with a very stable WIFI.
+For this project, I used an [Earu Electric Leakage breaker](https://es.aliexpress.com/item/1005005474961812.html?spm=a2g0o.productlist.main.1.64b72e8fBv8qNz&algo_pvid=0190745a-8ab6-4d1b-ae9a-2fc064272739&aem_p4p_detail=202308070751462216909798018100004414180&algo_exp_id=0190745a-8ab6-4d1b-ae9a-2fc064272739-0&pdp_npi=4%40dis%21EUR%2125.22%2113.62%21%21%2127.10%21%21%4021038eda16914199060958571e5420%2112000033229985254%21sea%21ES%21138088978%21&curPageLogUid=4T9VEiT2qT2n&search_p4p_id=202308070751462216909798018100004414180_1). Although it works well, it is true that it needs to be placed in a location with a very stable WIFI.
 All this kind of devices are very easy to install and you can just follow the instructions in the manual.
 This is a picture of my final setup:
 ![Picture](./assets/Earu_Meter_installed.jpg)
@@ -73,7 +72,7 @@ Go to Cloud->API Explorer.
 Click on **Query Device Details in Bulk**. Introduce the **Device ID** and click on **Submit Request**
 In the response, you will find a field **local_key**. Note down the value.
 
-*Note: You can get more detailed information [here](https://github.com/iRayanKhan/homebridge-tuya/wiki/Get-Local-Keys-for-your-devices)
+*Note: You can get more detailed information [here](https://github.com/iRayanKhan/homebridge-tuya/wiki/Get-Local-Keys-for-your-devices)*
 
 ## Create the Device in the Arduino Cloud
 ### Create the Device 
@@ -111,11 +110,16 @@ Access your Node-RED instance (typically `http://<YOUR_IP>:1880`) and import the
    a. Paste the code that you can find in [flows.json](https://github.com/dbduino-prjs/arduino-cloud-tuya-energy-nodered/blob/master/flow.json?raw=true) in the github project
    b. Click on `Import`
 2. Configure the Tuya nodes using the Device ID and Key that you obtained earlier
+
+![Node properties](assets/Node-RED-Arduino_Cloud-property-node.png)
+*Note: You can adjust your configuration to your needs. For instance, you could leave Device IP empty so that you use the platform directly*
+
 3. Configure the Arduino Cloud nodes
    a. Configure your connection with the Arduino Cloud API key that you created in the previous section  
    b. Introduce your Thing and property
+
 ![Node properties](assets/Node-RED-Arduino_Cloud-property-node.png)
-*Note: You can adjust your configuration to your needs. For instance, you could leave Device IP empty so that you use the platform directly*
+
 4. Click on **Deploy** (top right corner of the screen)
 
 ## Create the Arduino Cloud dashboard
