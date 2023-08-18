@@ -54,7 +54,8 @@ This is a picture of my final setup:
 
 ## Get your Tuya device API key
 The process is very straightforward. You just have to create a Tuya developer account, create an application and get the API key.
-*Note: Bear in mind that the Tuya account (the one used on your mobile app and the developer account are different, even if you use the same address. They will be linked during the process)*
+
+> Note: Bear in mind that the Tuya account (the one used on your mobile app and the developer account are different, even if you use the same address. They will be linked during the process)
 
 1. Sign up for an IoT account (if you don't have an account yet)
 Go to https://iot.tuya.com and click Sign Up
@@ -72,13 +73,14 @@ Go to Cloud->API Explorer.
 Click on **Query Device Details in Bulk**. Introduce the **Device ID** and click on **Submit Request**
 In the response, you will find a field **local_key**. Note down the value.
 
-*Note: You can get more detailed information [here](https://github.com/iRayanKhan/homebridge-tuya/wiki/Get-Local-Keys-for-your-devices)*
+> Note: You can get more detailed information [here](https://github.com/iRayanKhan/homebridge-tuya/wiki/Get-Local-Keys-for-your-devices)
 
 ## Create the Device in the Arduino Cloud
 ### Create the Device 
 Go to the [Devices](https://create.arduino.cc/iot/devices) section of the Arduino IoT Cloud and click on **ADD**. 
 Select **Any Device** and follow the instructions on the wizard.
-*Note: Save your `Device ID` and `Secret Key`. We are not going to use them (as we will use the API key), but it can be helpful for other use cases.*
+
+> Note: Save your `Device ID` and `Secret Key`. We are not going to use them (as we will use the API key), but it can be helpful for other use cases.
 
 ### Create the Thing 
 In the Devices list, find the device you just created and click on **CREATE THING** and assign a name to it.
@@ -94,29 +96,31 @@ Add the variables clicking on the ADD button. At the end of the process, your li
 | current             | FLOAT      | Real-time current |
 | total_forward_energy| FLOAT      | Accumulated energy |
 
-*Note: All the variables have to be READ-WRITE. You can define the periodicity you wish or set them with the policy ON-CHANGE.*
+> Note: All the variables have to be READ-WRITE. You can define the periodicity you wish or set them with the policy ON-CHANGE.*
 
 This is a screenshot for reference.
 ![Arduino Cloud variables](assets/Tuya-Energy_Meter-variables.png)
 
 ### Get an Arduino Cloud API key
-Go to https://cloud.arduino.cc/home/api-keys.
-Click on "CREATE API KEY", enter a name.
+- Go to https://cloud.arduino.cc/home/api-keys.
+- Click on **CREATE API KEY**, enter a name.
+
 Note down the Client ID and Client Secret or download the PDF. We will use these credentials in the Node-RED node.
 
 ## Create the Node-RED flow
 Access your Node-RED instance (typically `http://<YOUR_IP>:1880`) and import the code:
 1. Select `Import` in the menu
-   a. Paste the code that you can find in [flows.json](https://github.com/dbduino-prjs/arduino-cloud-tuya-energy-nodered/blob/master/flow.json?raw=true) in the github project
-   b. Click on `Import`
+   - Paste the code that you can find in [flows.json](https://github.com/dbduino-prjs/arduino-cloud-tuya-energy-nodered/blob/master/flow.json?raw=true) in the github project
+   - Click on `Import`
 2. Configure the Tuya nodes using the Device ID and Key that you obtained earlier
 
-![Node properties](assets/Node-RED-Arduino_Cloud-property-node.png)
-*Note: You can adjust your configuration to your needs. For instance, you could leave Device IP empty so that you use the platform directly*
+![Node properties](assets/Node-RED-Tuya-property-node.png)
+
+> Note: You can adjust your configuration to your needs. For instance, you could leave Device IP empty so that you use the platform directly*
 
 3. Configure the Arduino Cloud nodes
-   a. Configure your connection with the Arduino Cloud API key that you created in the previous section  
-   b. Introduce your Thing and property
+   - Configure your connection with the Arduino Cloud API key that you created in the previous section  
+   - Introduce your Thing and property
 
 ![Node properties](assets/Node-RED-Arduino_Cloud-property-node.png)
 
